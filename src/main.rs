@@ -1,5 +1,8 @@
-mod vec3;
+use color::{write_color, Color};
+use vec3::Vec3;
 
+mod color;
+mod vec3;
 
 fn main() {
     // Image
@@ -11,14 +14,12 @@ fn main() {
     for j in 0..image_height {
         dbg!("Scanlines remaining: ", image_height - j);
         for i in 0..image_width {
-            let r = (i as f64)  / (image_width as f64 - 1.0);
-            let g = (j as f64) / (image_height as f64 - 1.0);
-            let b = 0.0;
-            let ir = (255.999 * r) as i32;
-            let ig = (255.999 * g) as i32;
-            let ib = (255.999 * b) as i32;
-            println!("{} {} {}", ir, ig, ib);
-
+            let pixel_color: Color = Vec3::new(
+                (i as f64) / (image_width as f64 - 1.0),
+                (j as f64) / (image_height as f64 - 1.0),
+                0.0,
+            );
+            write_color(&pixel_color);
         }
     }
     dbg!("Done.           \n");

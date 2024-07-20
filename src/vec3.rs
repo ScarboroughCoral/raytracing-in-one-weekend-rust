@@ -1,36 +1,36 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
-struct Vec3(f64,f64,f64);
+pub struct Vec3(f64,f64,f64);
 
-type Point3 = Vec3;
+pub type Point3 = Vec3;
 
 impl Vec3 {
-    fn new(e0: f64, e1: f64, e2: f64) -> Self {
+    pub fn new(e0: f64, e1: f64, e2: f64) -> Self {
         return Vec3(e0,e1,e2);
     }
-    fn x(&self) -> f64 {
+    pub fn x(&self) -> f64 {
         self.0
     }
-    fn y(&self) -> f64 {
+    pub fn y(&self) -> f64 {
         self.1
     }
-    fn z(&self) -> f64 {
+    pub fn z(&self) -> f64 {
         self.2
     }
-    fn dot_with(&self, rhs: &Self) -> f64 {
+    pub fn dot_with(&self, rhs: &Self) -> f64 {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }
-    fn cross_with(&self, rhs: &Self) -> Vec3 {
+    pub fn cross_with(&self, rhs: &Self) -> Vec3 {
         Vec3(
             self.1 * rhs.2 - self.2 * rhs.1,
             self.2 * rhs.0 - self.0 * rhs.2,
             self.0 * rhs.1 - self.1 * rhs.0
         )
     }
-    fn unit_vector(&self) -> Vec3 {
+    pub fn unit_vector(&self) -> Vec3 {
         self / self.length()
     }
-    fn length(&self) -> f64 {
+    pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
     fn length_squared(&self) -> f64 {
