@@ -3,6 +3,7 @@ use vec3::Vec3;
 
 mod color;
 mod vec3;
+mod ray;
 
 fn main() {
     // Image

@@ -1,5 +1,6 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
+#[derive(Clone, Copy)]
 pub struct Vec3(f64,f64,f64);
 
 pub type Point3 = Vec3;
@@ -28,7 +29,7 @@ impl Vec3 {
         )
     }
     pub fn unit_vector(&self) -> Vec3 {
-        self / self.length()
+        *self / self.length()
     }
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
@@ -92,7 +93,7 @@ impl Mul<Vec3> for f64 {
     }
 }
 
-impl Div<f64> for &Vec3 {
+impl Div<f64> for Vec3 {
     type Output = Vec3;
 
     fn div(self, rhs: f64) -> Self::Output {
