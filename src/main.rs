@@ -7,20 +7,26 @@ mod vec3;
 mod ray;
 
 fn ray_color(r: &Ray) -> Color {
-    if (hit_sphere(&Vec3::new(0., 0., -1.), 0.5, r)) {
-        return  Color::new(1., 0., 0.);
+    let t = hit_sphere(&Vec3::new(0., 0., -1.), 0.5, r);
+    if t > 0.0 {
+        let normal_vector = (r.at(t) - Vec3::new(0., 0., -1.)).unit();
+        return 0.5 * Color::new(normal_vector.x() + 1., normal_vector.y() + 1., normal_vector.z() + 1.);
     }
-    let direction = r.direction().unit_vector();
+    let direction = r.direction().unit();
     let a = 0.5 * (direction.y() + 1.0);
     (1.0 - a) * Vec3::new(1.0, 1.0, 1.0) + a * Vec3::new(0.5, 0.7, 1.0)
 }
-fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> bool {
+fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> f64 {
     let oc = *center - *ray.origin();
     let a = ray.direction().dot_with_self();
     let b = -2.0 * ray.direction().dot_with(&oc);
     let c = oc.dot_with_self() - radius * radius;
     let discriminant = b * b - 4. * a * c;
-    return discriminant >= 0.;
+    if discriminant < 0. {
+        -1.
+    } else {
+        (-b - discriminant.sqrt()) / (2.0 * a)
+    }
 }
 fn main() {
     // Image
@@ -29,7 +35,7 @@ fn main() {
 
     // Calculate the image height, and ensure that it's at least 1.
     let image_height = (image_width as f64 / ASPECT_RATIO) as i32;
-    let image_height = if (image_height < 1) { 1 } else { image_height };
+    let image_height = if image_height < 1 { 1 } else { image_height };
 
     // Camera
     const FOCAL_LENGTH: f64 = 1.0;

@@ -31,7 +31,7 @@ impl Vec3 {
             self.0 * rhs.1 - self.1 * rhs.0
         )
     }
-    pub fn unit_vector(&self) -> Vec3 {
+    pub fn unit(&self) -> Vec3 {
         *self / self.length()
     }
     pub fn length(&self) -> f64 {
