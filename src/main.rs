@@ -5,6 +5,8 @@ use vec3::{Point3, Vec3};
 mod color;
 mod vec3;
 mod ray;
+mod hittable;
+mod sphere;
 
 fn ray_color(r: &Ray) -> Color {
     let t = hit_sphere(&Vec3::new(0., 0., -1.), 0.5, r);
