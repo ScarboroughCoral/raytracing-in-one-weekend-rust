@@ -21,6 +21,9 @@ impl Vec3 {
     pub fn dot_with(&self, rhs: &Self) -> f64 {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }
+    pub fn dot_with_self(&self) -> f64 {
+        self.dot_with(self)
+    }
     pub fn cross_with(&self, rhs: &Self) -> Vec3 {
         Vec3(
             self.1 * rhs.2 - self.2 * rhs.1,

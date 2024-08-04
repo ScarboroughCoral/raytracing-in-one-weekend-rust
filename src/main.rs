@@ -7,9 +7,20 @@ mod vec3;
 mod ray;
 
 fn ray_color(r: &Ray) -> Color {
+    if (hit_sphere(&Vec3::new(0., 0., -1.), 0.5, r)) {
+        return  Color::new(1., 0., 0.);
+    }
     let direction = r.direction().unit_vector();
     let a = 0.5 * (direction.y() + 1.0);
     (1.0 - a) * Vec3::new(1.0, 1.0, 1.0) + a * Vec3::new(0.5, 0.7, 1.0)
+}
+fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> bool {
+    let oc = *center - *ray.origin();
+    let a = ray.direction().dot_with_self();
+    let b = -2.0 * ray.direction().dot_with(&oc);
+    let c = oc.dot_with_self() - radius * radius;
+    let discriminant = b * b - 4. * a * c;
+    return discriminant >= 0.;
 }
 fn main() {
     // Image
