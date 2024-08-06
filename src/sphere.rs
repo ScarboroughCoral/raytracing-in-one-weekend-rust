@@ -1,3 +1,5 @@
+use std::default;
+
 use crate::{
     hittable::{HitRecord, Hittable},
     vec3::Point3,
@@ -38,10 +40,12 @@ impl Hittable for Sphere {
             }
         }
         let hit_point = r.at(root);
+        let (front_face, normal) = HitRecord::get_face_normal(r, &((hit_point - self.center) / self.radius));
         return Some(HitRecord {
             t: root,
             p: hit_point,
-            normal: (hit_point - self.center) / self.radius
+            normal,
+            front_face
         });
     }
 }
