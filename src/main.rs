@@ -1,5 +1,9 @@
+use std::rc::Rc;
+
 use color::{write_color, Color};
+use hittable::{HitRecord, Hittable, HittableList};
 use ray::Ray;
+use sphere::Sphere;
 use vec3::{Point3, Vec3};
 
 mod color;
@@ -8,28 +12,15 @@ mod ray;
 mod hittable;
 mod sphere;
 
-fn ray_color(r: &Ray) -> Color {
-    let t = hit_sphere(&Vec3::new(0., 0., -1.), 0.5, r);
-    if t > 0.0 {
-        let normal_vector = (r.at(t) - Vec3::new(0., 0., -1.)).unit();
-        return 0.5 * Color::new(normal_vector.x() + 1., normal_vector.y() + 1., normal_vector.z() + 1.);
+fn ray_color(r: &Ray, world: &dyn Hittable) -> Color {
+    if let Some(HitRecord { normal, ..}) = world.hit(r, 0., f64::INFINITY) {
+        return 0.5 * (normal + Color::new(1., 1., 1.));
     }
     let direction = r.direction().unit();
     let a = 0.5 * (direction.y() + 1.0);
     (1.0 - a) * Vec3::new(1.0, 1.0, 1.0) + a * Vec3::new(0.5, 0.7, 1.0)
 }
-fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> f64 {
-    let oc = *center - *ray.origin();
-    let a = ray.direction().length_squared();
-    let h = ray.direction().dot_with(&oc);
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = h * h - a * c;
-    if discriminant < 0. {
-        -1.
-    } else {
-        (h - discriminant.sqrt()) / a
-    }
-}
+
 fn main() {
     // Image
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -38,6 +29,12 @@ fn main() {
     // Calculate the image height, and ensure that it's at least 1.
     let image_height = (image_width as f64 / ASPECT_RATIO) as i32;
     let image_height = if image_height < 1 { 1 } else { image_height };
+
+    // world
+    let mut world = HittableList::default();
+
+    world.add(Rc::new(Sphere::new(Point3::new(0., 0., -1.), 0.5)));
+    world.add(Rc::new(Sphere::new(Point3::new(0., -100.5, -1.), 100.)));
 
     // Camera
     const FOCAL_LENGTH: f64 = 1.0;
@@ -67,7 +64,7 @@ fn main() {
             let ray_direction = pixel_center - camera_center;
             let ray = Ray::new(camera_center, ray_direction);
 
-            let pixel_color = ray_color(&ray);
+            let pixel_color = ray_color(&ray, &world);
             write_color(&pixel_color);
         }
     }
