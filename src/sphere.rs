@@ -1,5 +1,5 @@
 use crate::{
-    hittable::{HitRecord, Hittable}, interval::Interval, vec3::Point3, Ray
+    hittable::{HitRecord, Hittable}, interval::Interval, vec3::Point3, ray::Ray
 };
 
 pub struct Sphere {

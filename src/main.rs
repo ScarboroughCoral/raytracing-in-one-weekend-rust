@@ -1,74 +1,26 @@
 use std::rc::Rc;
 
-use color::{write_color, Color};
-use hittable::{HitRecord, Hittable, HittableList};
-use interval::Interval;
-use ray::Ray;
+use camera::Camera;
+use hittable::HittableList;
 use sphere::Sphere;
-use vec3::{Point3, Vec3};
+use vec3::Point3;
 
+mod camera;
 mod color;
-mod vec3;
-mod ray;
 mod hittable;
-mod sphere;
 mod interval;
-
-fn ray_color(r: &Ray, world: &dyn Hittable) -> Color {
-    if let Some(HitRecord { normal, ..}) = world.hit(r, Interval {min: 0., max: f64::INFINITY}) {
-        return 0.5 * (normal + Color::new(1., 1., 1.));
-    }
-    let direction = r.direction().unit();
-    let a = 0.5 * (direction.y() + 1.0);
-    (1.0 - a) * Vec3::new(1.0, 1.0, 1.0) + a * Vec3::new(0.5, 0.7, 1.0)
-}
+mod ray;
+mod sphere;
+mod vec3;
 
 fn main() {
-    // Image
-    const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    let image_width = 400;
-
-    // Calculate the image height, and ensure that it's at least 1.
-    let image_height = (image_width as f64 / ASPECT_RATIO) as i32;
-    let image_height = if image_height < 1 { 1 } else { image_height };
-
     // world
     let mut world = HittableList::default();
 
     world.add(Rc::new(Sphere::new(Point3::new(0., 0., -1.), 0.5)));
     world.add(Rc::new(Sphere::new(Point3::new(0., -100.5, -1.), 100.)));
-
-    // Camera
-    const FOCAL_LENGTH: f64 = 1.0;
-    let viewport_height = 2.0;
-    let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
-    let camera_center: Point3 = Vec3::new(0.0, 0.0, 0.0);
-
-    // Calculate the vectors across the horizontal and down the vertical viewport edges.
-    let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
-    let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
-
-    // Calculate the horizontal and vertical delta vectors from pixel to pixel.
-    let pixel_delta_u = viewport_u / image_width as f64;
-    let pixel_delta_v = viewport_v / image_height as f64;
-
-    // Calculate the location of the upper left pixel.
-    let viewport_upper_left = camera_center - Vec3::new(0.0, 0.0, FOCAL_LENGTH) - viewport_u / 2.0 - viewport_v / 2.0;
-    let pixel00_location = viewport_upper_left + (pixel_delta_u + pixel_delta_v) / 2.0;
-
-    // Render
-    println!("P3\n{} {}\n255", image_width, image_height);
-
-    for j in 0..image_height {
-        dbg!("Scanlines remaining: ", image_height - j);
-        for i in 0..image_width {
-            let pixel_center = pixel00_location + (i as f64 * pixel_delta_u) + (j as f64 * pixel_delta_v);
-            let ray_direction = pixel_center - camera_center;
-            let ray = Ray::new(camera_center, ray_direction);
-
-            let pixel_color = ray_color(&ray, &world);
-            write_color(&pixel_color);
-        }
-    }
-    dbg!("Done.           \n");
+    let mut camera = Camera::default();
+    camera.aspect_ratio = 16.0 / 9.0;
+    camera.image_width = 400;
+    camera.render(&world);
 }
