@@ -2,6 +2,7 @@ use std::rc::Rc;
 
 use color::{write_color, Color};
 use hittable::{HitRecord, Hittable, HittableList};
+use interval::Interval;
 use ray::Ray;
 use sphere::Sphere;
 use vec3::{Point3, Vec3};
@@ -11,9 +12,10 @@ mod vec3;
 mod ray;
 mod hittable;
 mod sphere;
+mod interval;
 
 fn ray_color(r: &Ray, world: &dyn Hittable) -> Color {
-    if let Some(HitRecord { normal, ..}) = world.hit(r, 0., f64::INFINITY) {
+    if let Some(HitRecord { normal, ..}) = world.hit(r, Interval {min: 0., max: f64::INFINITY}) {
         return 0.5 * (normal + Color::new(1., 1., 1.));
     }
     let direction = r.direction().unit();

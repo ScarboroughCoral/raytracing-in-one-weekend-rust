@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
+    interval::Interval,
     ray::Ray,
     vec3::{Point3, Vec3},
 };
@@ -28,7 +29,7 @@ impl HitRecord {
 }
 
 pub trait Hittable {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> Option<HitRecord>;
+    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord>;
 }
 
 #[derive(Default)]
@@ -47,17 +48,23 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord> {
         let mut temp_rec = HitRecord::default();
         let mut hit_anything = false;
-        let mut closest_so_far = ray_tmax;
+        let mut closest_so_far = ray_t.max;
         self.objects.iter().for_each(|object| {
-            if let Some(hit_record) = object.hit(r, ray_tmin, closest_so_far) {
+            if let Some(hit_record) = object.hit(
+                r,
+                Interval {
+                    min: ray_t.min,
+                    max: closest_so_far,
+                },
+            ) {
                 hit_anything = true;
                 closest_so_far = hit_record.t;
                 temp_rec = hit_record
             }
         });
-        return if hit_anything { Some(temp_rec)} else { None };
+        return if hit_anything { Some(temp_rec) } else { None };
     }
 }
