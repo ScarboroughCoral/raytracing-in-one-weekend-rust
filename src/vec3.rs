@@ -1,13 +1,15 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
+use rand::{thread_rng, Rng};
+
 #[derive(Clone, Copy)]
-pub struct Vec3(f64,f64,f64);
+pub struct Vec3(f64, f64, f64);
 
 pub type Point3 = Vec3;
 
 impl Vec3 {
     pub fn new(e0: f64, e1: f64, e2: f64) -> Self {
-        return Vec3(e0,e1,e2);
+        return Vec3(e0, e1, e2);
     }
     pub fn x(&self) -> f64 {
         self.0
@@ -28,7 +30,7 @@ impl Vec3 {
         Vec3(
             self.1 * rhs.2 - self.2 * rhs.1,
             self.2 * rhs.0 - self.0 * rhs.2,
-            self.0 * rhs.1 - self.1 * rhs.0
+            self.0 * rhs.1 - self.1 * rhs.0,
         )
     }
     pub fn unit(&self) -> Vec3 {
@@ -40,6 +42,39 @@ impl Vec3 {
     pub fn length_squared(&self) -> f64 {
         self.0 * self.0 + self.1 * self.1 + self.2 * self.2
     }
+    pub fn random() -> Self {
+        let mut rng = thread_rng();
+        Vec3(
+            rng.gen_range(0.0..1.0),
+            rng.gen_range(0.0..1.0),
+            rng.gen_range(0.0..1.0),
+        )
+    }
+    pub fn random_range(min: f64, max: f64) -> Self {
+        let mut rng = thread_rng();
+        Vec3(
+            rng.gen_range(min..max),
+            rng.gen_range(min..max),
+            rng.gen_range(min..max),
+        )
+    }
+    pub fn random_unit_sphere() -> Vec3 {
+        loop {
+            let p = Vec3::random_range(-1.0, 1.0);
+            let len_sq = p.length_squared();
+            if 1e-160 < len_sq && len_sq <= 1. {
+                return p;
+            }
+        }
+    }
+    pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
+        let on_unit_sphere = Self::random_unit_sphere();
+        if on_unit_sphere.dot_with(normal) > 0. {
+            on_unit_sphere
+        } else {
+            -on_unit_sphere 
+        }
+    }
 }
 
 impl Default for Vec3 {
@@ -48,12 +83,11 @@ impl Default for Vec3 {
     }
 }
 
-
 impl Neg for Vec3 {
     type Output = Vec3;
 
     fn neg(self) -> Self::Output {
-        Vec3(-self.0,-self.1,-self.2)
+        Vec3(-self.0, -self.1, -self.2)
     }
 }
 

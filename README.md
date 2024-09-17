@@ -16,4 +16,5 @@ cargo run > image.ppm
 <img src="./output/6.1.png"/>
 <img src="./output/6.7.png"/>
 <img src="./output/8.png"/>
+<img src="./output/9.3.png"/>
 </div>
